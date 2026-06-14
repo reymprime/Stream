@@ -40,6 +40,8 @@
 
     let currentUserUid = null;
 
+// Authentication //
+
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = "login.html";
@@ -282,9 +284,20 @@
         .upload-zone { background: var(--glass-card); border: 1px dashed rgba(255,255,255,0.2); border-radius: var(--radius-card); padding: 24px; text-align: center; cursor: pointer; margin-bottom: 16px; }
         .upload-zone:hover { border-color: var(--brand-green); background: rgba(30, 215, 96, 0.05); }
 
+        .playlist-accordion { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-light); border-radius: var(--radius-card); padding: 6px; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); max-height: 56px; }
+        .playlist-accordion.expanded { max-height: 500px; border-color: rgba(255, 255, 255, 0.12); }
+        .accordion-trigger { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .playlist-accordion.expanded .accordion-trigger i { transform: rotate(180deg); color: var(--brand-green); }
+        .accordion-content { opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; padding: 4px 6px 10px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .playlist-accordion.expanded .accordion-content { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
         .sub-option-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-light); border-radius: 14px; padding: 14px 16px; font-size: 14px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: var(--ease); user-select: none; }
         .sub-option-card:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-color: var(--border-highlight); }
         .badge-count { font-size: 11px; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: var(--radius-pill); color: var(--text-secondary); }
+
+        .playlist-item-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid var(--border-light); padding: 14px 18px; border-radius: 16px; cursor: pointer; transition: var(--ease); }
+        .playlist-item-row:hover { background: rgba(255,255,255,0.08); border-color: var(--border-highlight); }
+        .playlist-item-row * { pointer-events: none; }
 
         .info-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 20px; }
         .info-overlay.active { opacity: 1; pointer-events: auto; }
@@ -296,6 +309,8 @@
         .pwa-tech-tag { background: rgba(255,255,255,0.04); border: 1px solid var(--border-light); padding: 10px 14px; border-radius: 12px; font-size: 13px; }
         .pwa-tech-tag strong { color: white; display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
 
+        .modal-select { background: #141615; border: 1px solid var(--border-light); color: white; padding: 12px 16px; border-radius: 12px; outline: none; font-size: 14px; width: 100%; margin-top: 6px; }
+        .modal-input { background: #141615; border: 1px solid var(--border-light); color: white; padding: 12px 16px; border-radius: 12px; outline: none; font-size: 14px; width: 100%; }
         .close-info-btn { background: var(--text-primary); color: #000; border: none; padding: 12px 20px; font-size: 14px; font-weight: 700; border-radius: var(--radius-pill); cursor: pointer; width: 100%; margin-top: 16px; }
 
         .back-btn-container { display: flex; align-items: center; gap: 8px; color: var(--brand-green); font-weight: 600; font-size: 14px; cursor: pointer; margin-bottom: 16px; width: max-content; }
@@ -400,6 +415,7 @@
                     <ul style="font-size: 12px; color: #a1a1aa; padding-left: 16px; display: flex; flex-direction: column; gap: 4px;">
                         <li>Tap the <strong style="color: white;">(+)</strong> button above to paste and import any YouTube audio or podcast link directly into your library.</li>
                         <li>Navigate to the <strong style="color: white;">Offline</strong> tab to upload and stream local .mp3 or .m4a files directly from your system storage.</li>
+                        <li>Tap the <strong style="color: white;">Download Icon</strong> on cloud-sourced items to easily convert and save your favorite media using our integrated download portal.</li>
                     </ul>
                 </div>
                 <button class="close-info-btn" style="background:var(--brand-green); color:black; margin-top: 10px;" onclick="App.closePwaInfoModal()">Get Started</button>
@@ -452,6 +468,42 @@
                 <button class="deck-btn deck-btn-main-trigger" onclick="App.togglePlayPause()"><i data-lucide="pause" fill="currentColor" id="overlay-icon-playpause" style="width:28px; height:28px;"></i></button>
                 <button class="deck-btn deck-btn-skip" onclick="App.playNext()"><i data-lucide="skip-forward" fill="currentColor" style="width:26px; height:26px;"></i></button>
                 <button class="deck-btn deck-btn-secondary" onclick="App.routeContextPlaylistFromOverlay()"><i data-lucide="folder-heart"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-overlay" id="playlist-modal" onclick="App.closePlaylistModal()">
+        <div class="info-card" onclick="event.stopPropagation()">
+            <h3 id="modal-track-title" style="font-size:17px; margin-bottom:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Manage Playlist</h3>
+            <div class="info-body">
+                <div>
+                    <label style="font-size:12px; color:var(--text-secondary);">Select Target Partition Directory</label>
+                    <select id="modal-playlist-select" class="modal-select"><option value="">-- No Playlists Available --</option></select>
+                </div>
+                <button class="close-info-btn" style="margin-top:4px;" onclick="App.addTrackToExistingPlaylist()">Add to Selected Folder</button>
+                <div style="text-align:center; margin:8px 0; font-size:11px; color:var(--text-secondary); font-weight:bold; letter-spacing:1px;">OR RE-ROUTE PILE</div>
+                <input type="text" id="modal-playlist-name" class="modal-input" placeholder="Type new playlist catalog folder title...">
+                <button class="close-info-btn" style="background:var(--brand-green); color:black; margin-top:4px;" onclick="App.createNewPlaylistFromModal()">Generate & Map Record</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-overlay" id="playlist-options-modal" onclick="App.closePlaylistOptionsModal()">
+        <div class="info-card" onclick="event.stopPropagation()">
+            <h3 id="options-playlist-title" style="font-size:17px; margin-bottom:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Options</h3>
+            <div class="info-body">
+                <div class="sub-option-card" onclick="App.renamePlaylist()">
+                    <div style="display:flex; align-items:center; gap:10px; pointer-events:none;">
+                        <i data-lucide="edit-2" style="color:var(--text-primary); width:18px;"></i>
+                        <span>Rename Playlist</span>
+                    </div>
+                </div>
+                <div class="sub-option-card" onclick="App.deletePlaylist()">
+                    <div style="display:flex; align-items:center; gap:10px; pointer-events:none;">
+                        <i data-lucide="trash-2" style="color:#ff4444; width:18px;"></i>
+                        <span style="color:#ff4444;">Delete Playlist</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -557,7 +609,7 @@
         async delete(id) {
             return new Promise((resolve) => {
                 const tx = this.db.transaction("tracks", "readwrite");
-                const req = tx.objectStore("tracks").delete(id);
+                tx.objectStore("tracks").delete(id);
                 tx.oncomplete = () => resolve();
             });
         }
@@ -595,8 +647,17 @@
         currentTab: 'all',
         queue: [], queueIndex: 0,
         localCache: [],
+        isAccordionExpanded: false,
         lastTapTime: 0,
+        selectedTrackForModal: null,
+        selectedModalType: 'yt', 
+        activeSubPlaylistName: null,
         progressInterval: null,
+        
+        longPressTimer: null,
+        isLongPress: false,
+        selectedPlaylistForOptions: null,
+        selectedPlaylistTypeForOptions: null,
 
         async init() {
             lucide.createIcons();
@@ -616,25 +677,93 @@
 
         switchTab(tabName, index) {
             this.currentTab = tabName;
+            this.activeSubPlaylistName = null; 
             document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === index));
             document.getElementById('tab-slider').style.transform = `translateX(${index * 100}%)`;
             this.updateUI();
         },
 
-        handleDirectoryDoubleTap(targetPartition) {
+        togglePlaylistAccordion() {
+            this.isAccordionExpanded = !this.isAccordionExpanded;
+            document.getElementById('playlist-wrapper').classList.toggle('expanded', this.isAccordionExpanded);
+        },
+
+        handleDirectoryDoubleTap(type) {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - this.lastTapTime;
             this.lastTapTime = currentTime;
-            
             if (tapLength < 300 && tapLength > 0) {
-                this.currentTab = targetPartition;
+                this.currentTab = type === 'local' ? 'sub_playlist_local_root' : 'sub_playlist_yt_root';
+                this.updateUI();
+            }
+        },
+
+        handlePlaylistTouchStart(name, type, e) {
+            this.isLongPress = false;
+            this.cancelLongPress();
+            this.longPressTimer = setTimeout(() => {
+                this.isLongPress = true;
+                this.openPlaylistOptionsModal(name, type);
+            }, 600);
+        },
+
+        handlePlaylistTouchEnd(name, type, e) {
+            if (this.longPressTimer) {
+                clearTimeout(this.longPressTimer);
+                this.longPressTimer = null;
+            }
+            if (!this.isLongPress) {
+                if (e && e.type === 'touchend') e.preventDefault();
+                App.enterSpecificPlaylist(name);
+            }
+        },
+
+        cancelLongPress() {
+            if (this.longPressTimer) {
+                clearTimeout(this.longPressTimer);
+                this.longPressTimer = null;
+            }
+        },
+
+        openPlaylistOptionsModal(name, type) {
+            this.selectedPlaylistForOptions = name;
+            this.selectedPlaylistTypeForOptions = type;
+            document.getElementById('options-playlist-title').innerText = `Options: "${name}"`;
+            document.getElementById('playlist-options-modal').classList.add('active');
+        },
+
+        closePlaylistOptionsModal() {
+            document.getElementById('playlist-options-modal').classList.remove('active');
+        },
+
+        renamePlaylist() {
+            this.closePlaylistOptionsModal();
+            const newName = prompt(`Enter new name for "${this.selectedPlaylistForOptions}":`, this.selectedPlaylistForOptions);
+            if (!newName || newName.trim() === '' || newName === this.selectedPlaylistForOptions) return;
+            
+            const existing = DataManager.data.playlists.find(p => p.name.toLowerCase() === newName.trim().toLowerCase() && p.type === this.selectedPlaylistTypeForOptions);
+            if(existing) return alert("Playlist name already exists in this category.");
+            
+            const playlist = DataManager.data.playlists.find(p => p.name === this.selectedPlaylistForOptions && p.type === this.selectedPlaylistTypeForOptions);
+            if (playlist) {
+                playlist.name = newName.trim();
+                DataManager.save();
+                this.updateUI();
+            }
+        },
+
+        deletePlaylist() {
+            this.closePlaylistOptionsModal();
+            if (confirm(`Are you sure you want to delete the playlist "${this.selectedPlaylistForOptions}"?`)) {
+                DataManager.data.playlists = DataManager.data.playlists.filter(p => !(p.name === this.selectedPlaylistForOptions && p.type === this.selectedPlaylistTypeForOptions));
+                DataManager.save();
                 this.updateUI();
             }
         },
 
         async handleDownloadTrigger(trackId, event) {
             event.stopPropagation();
-            const targetUrl = `https://www.youtube.com/watch?v=$${trackId}`;
+            const targetUrl = `https://www.youtube.com/watch?v=${trackId}`;
             try {
                 await navigator.clipboard.writeText(targetUrl);
                 window.open('https://yt2mp3.ai/', '_blank');
@@ -642,6 +771,63 @@
                 window.open('https://yt2mp3.ai/', '_blank');
             }
         },
+
+        openPlaylistModal(trackId, type, e) {
+            e.stopPropagation();
+            this.selectedTrackForModal = trackId;
+            this.selectedModalType = type;
+            const trackListSource = type === 'local' ? this.localCache : DataManager.data.tracks;
+            const targetTrack = trackListSource.find(t => t.id === trackId);
+            document.getElementById('modal-track-title').innerText = `Folder Router: "${targetTrack ? targetTrack.title : 'Selected Track'}"`;
+            this.populateModalSelect(type);
+            document.getElementById('playlist-modal').classList.add('active');
+        },
+
+        closePlaylistModal() {
+            document.getElementById('playlist-modal').classList.remove('active');
+            document.getElementById('modal-playlist-name').value = '';
+        },
+
+        populateModalSelect(type) {
+            const select = document.getElementById('modal-playlist-select');
+            select.innerHTML = '';
+            const filtered = DataManager.data.playlists.filter(p => p.type === type);
+            if(filtered.length === 0) {
+                select.innerHTML = '<option value=""> No Folders Found </option>';
+                return;
+            }
+            filtered.forEach(p => {
+                select.insertAdjacentHTML('beforeend', `<option value="${this.escape(p.name)}">${this.escape(p.name)}</option>`);
+            });
+        },
+
+        createNewPlaylistFromModal() {
+            const nameInput = document.getElementById('modal-playlist-name').value.trim();
+            if(!nameInput) return alert("Please type a clean partition tag label.");
+            const existing = DataManager.data.playlists.find(p => p.name.toLowerCase() === nameInput.toLowerCase() && p.type === this.selectedModalType);
+            if(existing) return alert("Folder tracking duplicate detected.");
+
+            const newPlaylist = { name: nameInput, type: this.selectedModalType, trackIds: [this.selectedTrackForModal] };
+            DataManager.data.playlists.push(newPlaylist);
+            DataManager.save();
+            this.closePlaylistModal();
+            this.updateUI();
+        },
+
+        addTrackToExistingPlaylist() {
+            const select = document.getElementById('modal-playlist-select');
+            const selectedName = select.value;
+            if(!selectedName) return alert("Generate or select a routing target directory option map.");
+            const playlist = DataManager.data.playlists.find(p => p.name === selectedName && p.type === this.selectedModalType);
+            if(playlist) {
+                if(playlist.trackIds.includes(this.selectedTrackForModal)) return alert("Asset sequence index duplicated inside targeted partition array.");
+                playlist.trackIds.push(this.selectedTrackForModal); DataManager.save();
+            }
+            this.closePlaylistModal();
+            this.updateUI();
+        },
+
+        enterSpecificPlaylist(name) { this.activeSubPlaylistName = name; this.updateUI(); },
 
         updateUI() {
             const list = document.getElementById('track-list');
@@ -653,7 +839,7 @@
                 tracks = DataManager.data.tracks;
             } 
             else if (this.currentTab === 'favorites') {
-                document.getElementById('list-title').innerText = 'Favorites';
+                document.getElementById('list-title').innerText = 'Liked Songs';
                 const ytFavs = DataManager.data.tracks.filter(t => t.favorite).map(t => ({...t, type: 'yt'}));
                 const localFavs = this.localCache.filter(t => t.favorite).map(t => ({...t, type: 'local'}));
                 
@@ -662,7 +848,7 @@
                     tracks.push(...ytFavs);
                 }
                 if (localFavs.length > 0) {
-                    tracks.push({ isHeader: true, title: 'Offline Music Favorites', color: 'var(--brand-green)', icon: 'folder-music' });
+                    tracks.push({ isHeader: true, title: 'Offline Favorites', color: 'var(--brand-green)', icon: 'folder-music' });
                     tracks.push(...localFavs);
                 }
             } 
@@ -678,46 +864,112 @@
                 `);
             } 
             else if (this.currentTab === 'playlists') {
-                document.getElementById('list-title').innerText = 'Playlists';
-                const offlineFavsCount = this.localCache.filter(t => t.favorite).length;
-                const ytFavsCount = DataManager.data.tracks.filter(t => t.favorite).length;
+                document.getElementById('list-title').innerText = 'Root Directories';
+                const offlineFoldersCount = DataManager.data.playlists.filter(p => p.type === 'local').length;
+                const ytFoldersCount = DataManager.data.playlists.filter(p => p.type === 'yt').length;
 
                 list.innerHTML = `
-                    <div style="display:flex; flex-direction:column; gap:12px; width:100%;">
-                        <div class="sub-option-card" onclick="App.handleDirectoryDoubleTap('inner_offline_favorites')">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <i data-lucide="folder-music" style="color:var(--brand-green); width:18px;"></i>
-                                <span>Offline Music Favorites</span>
-                            </div>
-                            <span class="badge-count">${offlineFavsCount} Tracks</span>
+                    <div class="playlist-accordion ${this.isAccordionExpanded ? 'expanded' : ''}" id="playlist-wrapper">
+                        <div class="accordion-trigger" onclick="App.togglePlaylistAccordion()">
+                            <span>Available Core Folders</span>
+                            <i data-lucide="chevron-down"></i>
                         </div>
-                        <div class="sub-option-card" onclick="App.handleDirectoryDoubleTap('inner_youtube_favorites')">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <i data-lucide="youtube" style="color:#ff0000; width:18px;"></i>
-                                <span>YouTube Favorites</span>
+                        <div class="accordion-content">
+                            <div class="sub-option-card" onclick="App.handleDirectoryDoubleTap('local')">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <i data-lucide="folder-music" style="color:var(--brand-green); width:18px;"></i>
+                                    <span>Offline Music Favorites</span>
+                                </div>
+                                <span class="badge-count">${offlineFoldersCount} Playlists</span>
                             </div>
-                            <span class="badge-count">${ytFavsCount} Tracks</span>
+                            <div class="sub-option-card" onclick="App.handleDirectoryDoubleTap('yt')">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <i data-lucide="youtube" style="color:#ff0000; width:18px;"></i>
+                                    <span>YouTube Favorites</span>
+                                </div>
+                                <span class="badge-count">${ytFoldersCount} Playlists</span>
+                            </div>
                         </div>
                     </div>
                 `;
-                document.getElementById('list-count').innerText = "2 Core Folders";
+                document.getElementById('list-count').innerText = "2 Folders Mapped";
                 lucide.createIcons(); return;
             }
-            else if (this.currentTab === 'inner_offline_favorites') {
-                document.getElementById('list-title').innerText = 'Offline Music Favorites';
-                list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.switchTab('playlists', 2)"><i data-lucide="arrow-left" style="width:16px;"></i> Return to Playlists</div>`);
-                tracks = this.localCache.filter(t => t.favorite).map(t => ({...t, type: 'local'}));
+            else if (this.currentTab === 'sub_playlist_local_root') {
+                if (this.activeSubPlaylistName) {
+                    document.getElementById('list-title').innerText = `Offline › ${this.activeSubPlaylistName}`;
+                    list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.enterSpecificPlaylist(null)"><i data-lucide="arrow-left" style="width:16px;"></i> View All Offline Folders</div>`);
+                    const playlist = DataManager.data.playlists.find(p => p.name === this.activeSubPlaylistName && p.type === 'local');
+                    if(playlist) tracks = this.localCache.filter(t => playlist.trackIds.includes(t.id)).map(t => ({...t, type: 'local'}));
+                } else {
+                    document.getElementById('list-title').innerText = 'Offline Playlists';
+                    list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.switchTab('playlists', 2)"><i data-lucide="arrow-left" style="width:16px;"></i> Return to Core Tree</div>`);
+                    const filteredPlaylists = DataManager.data.playlists.filter(p => p.type === 'local');
+                    document.getElementById('list-count').innerText = `${filteredPlaylists.length} Playlists`;
+                    if(filteredPlaylists.length === 0) {
+                        list.insertAdjacentHTML('beforeend', `<div style="text-align:center; padding:40px; color:var(--text-secondary); font-size:14px;">No localized offline file schemas generated yet.</div>`);
+                        lucide.createIcons(); return;
+                    }
+                    filteredPlaylists.forEach(p => {
+                        list.insertAdjacentHTML('beforeend', `
+                            <div class="playlist-item-row" 
+                                 onmousedown="App.handlePlaylistTouchStart('${this.escape(p.name)}', 'local', event)"
+                                 onmouseup="App.handlePlaylistTouchEnd('${this.escape(p.name)}', 'local', event)"
+                                 onmouseleave="App.cancelLongPress()"
+                                 ontouchstart="App.handlePlaylistTouchStart('${this.escape(p.name)}', 'local', event)"
+                                 ontouchend="App.handlePlaylistTouchEnd('${this.escape(p.name)}', 'local', event)"
+                                 ontouchcancel="App.cancelLongPress()">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <i data-lucide="folder" style="color:var(--brand-green);"></i>
+                                    <span style="font-weight:600;">${this.escape(p.name)}</span>
+                                </div>
+                                <span class="badge-count">${p.trackIds.length} Tracks</span>
+                            </div>
+                        `);
+                    });
+                    lucide.createIcons(); return;
+                }
             }
-            else if (this.currentTab === 'inner_youtube_favorites') {
-                document.getElementById('list-title').innerText = 'YouTube Favorites';
-                list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.switchTab('playlists', 2)"><i data-lucide="arrow-left" style="width:16px;"></i> Return to Playlists</div>`);
-                tracks = DataManager.data.tracks.filter(t => t.favorite).map(t => ({...t, type: 'yt'}));
+            else if (this.currentTab === 'sub_playlist_yt_root') {
+                if (this.activeSubPlaylistName) {
+                    document.getElementById('list-title').innerText = `YouTube › ${this.activeSubPlaylistName}`;
+                    list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.enterSpecificPlaylist(null)"><i data-lucide="arrow-left" style="width:16px;"></i> View All Cloud Folders</div>`);
+                    const playlist = DataManager.data.playlists.find(p => p.name === this.activeSubPlaylistName && p.type === 'yt');
+                    if(playlist) tracks = DataManager.data.tracks.filter(t => playlist.trackIds.includes(t.id)).map(t => ({...t, type: 'yt'}));
+                } else {
+                    document.getElementById('list-title').innerText = 'YouTube Playlists';
+                    list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.switchTab('playlists', 2)"><i data-lucide="arrow-left" style="width:16px;"></i> Return to Core Tree</div>`);
+                    const filteredPlaylists = DataManager.data.playlists.filter(p => p.type === 'yt');
+                    document.getElementById('list-count').innerText = `${filteredPlaylists.length} Playlists`;
+                    if(filteredPlaylists.length === 0) {
+                        list.insertAdjacentHTML('beforeend', `<div style="text-align:center; padding:40px; color:var(--text-secondary); font-size:14px;">No YouTube track playlist catalogs initialized yet.</div>`);
+                        lucide.createIcons(); return;
+                    }
+                    filteredPlaylists.forEach(p => {
+                        list.insertAdjacentHTML('beforeend', `
+                            <div class="playlist-item-row" 
+                                 onmousedown="App.handlePlaylistTouchStart('${this.escape(p.name)}', 'yt', event)"
+                                 onmouseup="App.handlePlaylistTouchEnd('${this.escape(p.name)}', 'yt', event)"
+                                 onmouseleave="App.cancelLongPress()"
+                                 ontouchstart="App.handlePlaylistTouchStart('${this.escape(p.name)}', 'yt', event)"
+                                 ontouchend="App.handlePlaylistTouchEnd('${this.escape(p.name)}', 'yt', event)"
+                                 ontouchcancel="App.cancelLongPress()">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <i data-lucide="folder" style="color:#ff0000;"></i>
+                                    <span style="font-weight:600;">${this.escape(p.name)}</span>
+                                </div>
+                                <span class="badge-count">${p.trackIds.length} Tracks</span>
+                            </div>
+                        `);
+                    });
+                    lucide.createIcons(); return;
+                }
             }
 
             const trackCount = tracks.filter(t => !t.isHeader).length;
             document.getElementById('list-count').innerText = `${trackCount} Tracks`;
             if (trackCount === 0 && this.currentTab !== 'offline') {
-                list.insertAdjacentHTML('beforeend', `<div style="text-align:center; padding: 40px; color: var(--text-secondary); font-size:14px;">This folder layout node is empty.</div>`);
+                list.insertAdjacentHTML('beforeend', `<div style="text-align:center; padding: 40px; color: var(--text-secondary); font-size:14px;">This layout node directory array is empty.</div>`);
                 return;
             }
 
@@ -758,9 +1010,11 @@
                         </div>
                         <div class="actions">
                             ${isLocal ? `
+                                <button class="action-btn" onclick="App.openPlaylistModal('${t.id}', 'local', event)"><i data-lucide="folder-plus"></i></button>
                                 <button class="action-btn fav ${t.favorite?'active':''}" onclick="App.favLocal('${t.id}', event)"><i data-lucide="heart" fill="${t.favorite?'var(--brand-green)':'none'}"></i></button>
                             ` : `
                                 <button class="action-btn" onclick="App.handleDownloadTrigger('${t.id}', event)"><i data-lucide="download"></i></button>
+                                <button class="action-btn" onclick="App.openPlaylistModal('${t.id}', 'yt', event)"><i data-lucide="list-plus"></i></button>
                                 <button class="action-btn fav ${t.favorite?'active':''}" onclick="App.fav('${t.id}', event)"><i data-lucide="heart" fill="${t.favorite?'var(--brand-green)':'none'}"></i></button>
                             `}
                             <button class="action-btn" onclick="App.confirmDelete('${t.id}', ${isLocal}, event)"><i data-lucide="trash-2"></i></button>
@@ -807,7 +1061,7 @@
         async playTrack(id, type = 'yt') {
             this.currentTrackId = id; this.currentTrackType = type;
             let flatQueue = [];
-            if (this.currentTab === 'favorites' || this.currentTab === 'inner_offline_favorites' || this.currentTab === 'inner_youtube_favorites') {
+            if (this.currentTab === 'favorites') {
                const ytFavs = DataManager.data.tracks.filter(t => t.favorite).map(t => ({...t, type: 'yt'}));
                const localFavs = this.localCache.filter(t => t.favorite).map(t => ({...t, type: 'local'}));
                flatQueue = [...ytFavs, ...localFavs];
@@ -908,6 +1162,7 @@
             const card = document.getElementById(`card-track-${this.currentTrackId}`);
             if(card) card.classList.toggle('is-active-streaming', isPlaying);
 
+            // Dynamic modification ng state status text pre
             const statusLabel = document.getElementById('overlay-txt-status');
             if (statusLabel) {
                 statusLabel.innerText = isPlaying ? 'Now Playing' : 'Not Playing';
@@ -1012,13 +1267,9 @@
         routeContextPlaylistFromOverlay() {
             this.closeFullscreenPlayer();
             if(this.currentTrackType === 'local') {
-                this.switchTab('playlists', 2);
-                this.currentTab = 'inner_offline_favorites';
-                this.updateUI();
+                this.switchTab('sub_playlist_local_root', 2);
             } else {
-                this.switchTab('playlists', 2);
-                this.currentTab = 'inner_youtube_favorites';
-                this.updateUI();
+                this.switchTab('sub_playlist_yt_root', 2);
             }
         },
 
@@ -1041,6 +1292,9 @@
         async del(id, isLocal) {
             if(isLocal) { await DBManager.delete(id); this.localCache = await DBManager.getAll(); }
             else { DataManager.data.tracks = DataManager.data.tracks.filter(t => t.id !== id); DataManager.save(); }
+            
+            DataManager.data.playlists.forEach(p => { p.trackIds = p.trackIds.filter(tid => tid !== id); });
+            DataManager.save();
 
             if(this.currentTrackId === id) {
                 this.stopProgressTracking();
