@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In — Sign Up</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background: radial-gradient(circle at center, #121212 0%, #050505 100%);
+            color: #ffffff;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+        }
+        .auth-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 40px; width: 320px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        h2 { 
+            color: #1db954; 
+            margin-top: 0;
+            margin-bottom: 24px; 
+            letter-spacing: 1px;
+        }
+        
+        /* STANDARD INPUT STYLING */
+        input {
+            width: 100%; 
+            padding: 14px 16px; 
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px; 
+            color: #fff; 
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #1db954;
+        }
+        
+        /* BULLETPROOF PASSWORD WRAPPER */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .password-wrapper input {
+            margin-bottom: 0; /* Inalis para yung wrapper ang magdala ng spacing */
+            padding-right: 48px; /* Extra space sa kanan para di tamaan ng text yung icon */
+        }
+        .toggle-password-btn {
+            position: absolute;
+            right: 14px; /* Naka-lock sa kanang bahagi */
+            top: 50%;
+            transform: translateY(-50%); /* Para eksaktong gitna pataas-pababa */
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            color: #71717a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .toggle-password-btn:hover {
+            color: #ffffff;
+        }
+
+        button#btn-action {
+            width: 100%; padding: 14px;
+            background: #1db954; border: none; border-radius: 8px;
+            color: #121212; font-weight: bold; cursor: pointer;
+            font-size: 15px;
+            margin-top: 5px;
+            transition: background 0.2s ease;
+        }
+        button#btn-action:hover {
+            background: #1ed760;
+        }
+
+        .toggle-text { margin-top: 20px; font-size: 13px; color: #b3b3b3; }
+        .toggle-text span { color: #1db954; cursor: pointer; text-decoration: none; font-weight: bold; }
+        .toggle-text span:hover { text-decoration: underline; }
+        
+        /* PREMIUM GLASSMORPHISM TOAST ALERT */
+        .custom-toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        }
+        .custom-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .toast-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 68, 68, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff4444;
+            flex-shrink: 0;
+        }
+        .toast-content { flex: 1; }
+        .toast-title { font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
+        .toast-message { font-size: 12.5px; color: #a1a1aa; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h2 id="auth-title">LOG IN</h2>
+        
+        <input type="email" id="email" placeholder="Email Address" required>
+        
+        <div class="password-wrapper">
+            <input type="password" id="password" placeholder="Password (6+ chars)" required>
+            <button type="button" class="toggle-password-btn" id="toggle-password" title="Toggle Password Visibility">
+                <i data-lucide="eye" id="eye-icon" style="width: 18px; height: 18px;"></i>
+            </button>
+        </div>
+
+        <button id="btn-action">Sign In</button>
+        <p class="toggle-text" id="toggle-mode">
+            New here? <span id="toggle-link">Create an Account</span>
+        </p>
+    </div>
+    
+    <div class="custom-toast" id="toast-notification">
+        <div class="toast-icon" id="toast-icon-box">
+            <i data-lucide="alert-circle" style="width: 20px; height: 20px;"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title" id="toast-header-title">System Notice</div>
+            <div class="toast-message" id="toast-body-text">Something went wrong.</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUDPbyvZI7RShBr3ozBk06GfI7V4hSpmE",
+            authDomain: "gnokz-pro.firebaseapp.com",
+            projectId: "gnokz-pro",
+            storageBucket: "gnokz-pro.firebasestorage.app",
+            messagingSenderId: "88912267824",
+            appId: "1:88912267824:web:64075cc3a81a94e14e3bf5",
+            measurementId: "G-NG3DXEJ2Y4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const authTitle = document.getElementById('auth-title');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const btnAction = document.getElementById('btn-action');
+        const toggleLink = document.getElementById('toggle-link');
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const eyeIcon = document.getElementById('eye-icon');
+
+        let isLoginMode = true;
+        let toastTimeout = null;
+
+        // EYE TOGGLE VISIBILITY SCRIPT
+        togglePasswordBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            eyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+
+        // MASTER CUSTOM TOAST TRIGGER LOGIC
+        window.showCustomToast = function(message, title = "Login Security Notice", isSuccess = false) {
+            const toast = document.getElementById('toast-notification');
+            const toastTitle = document.getElementById('toast-header-title');
+            const toastText = document.getElementById('toast-body-text');
+            const iconBox = document.getElementById('toast-icon-box');
+
+            toastTitle.innerText = title;
+            
+            if (message.includes("auth/invalid-credential") || message.includes("invalid-credential")) {
+                toastText.innerText = "Invalid email or password. Please verify and try again.";
+            } else if (message.includes("auth/missing-password") || message.includes("missing-password")) {
+                toastText.innerText = "Password field is empty. Please enter your account password.";
+            } else if (message.includes("auth/weak-password")) {
+                toastText.innerText = "The security password is too weak. It must be at least 6 characters long.";
+            } else if (message.includes("auth/invalid-email")) {
+                toastText.innerText = "The provided email address format is invalid.";
+            } else if (message.includes("auth/email-already-in-use")) {
+                toastText.innerText = "This email is already registered. Please proceed to sign in instead.";
+            } else {
+                toastText.innerText = message;
+            }
+
+            if (isSuccess) {
+                toast.style.borderColor = "rgba(30, 215, 96, 0.35)";
+                iconBox.style.background = "rgba(30, 215, 96, 0.15)";
+                iconBox.style.color = "#1ed760";
+                iconBox.innerHTML = '<i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>';
+            } else {
+                toast.style.borderColor = "rgba(255, 68, 68, 0.35)";
+                iconBox.style.background = "rgba(255, 68, 68, 0.15)";
+                iconBox.style.color = "#ff4444";
+                iconBox.innerHTML = '<i data-lucide="alert-circle" style="width: 20px; height: 20px;"></i>';
+            }
+
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+
+            toast.classList.add('show');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 4500);
+        };
+
+        // LOGIN / SIGNUP MODE CONTROLLER
+        function updateAuthUI() {
+            if (isLoginMode) {
+                authTitle.innerText = "LOG IN";
+                btnAction.innerText = "Sign In";
+                document.getElementById('toggle-mode').innerHTML = 'New here? <span id="toggle-link">Create an Account</span>';
+            } else {
+                authTitle.innerText = "SIGN UP";
+                btnAction.innerText = "Register";
+                document.getElementById('toggle-mode').innerHTML = 'Already have an account? <span id="toggle-link">Log in here</span>';
+            }
+            document.getElementById('toggle-link').addEventListener('click', () => {
+                isLoginMode = !isLoginMode;
+                updateAuthUI();
+            });
+        }
+
+        document.getElementById('toggle-link').addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            updateAuthUI();
+        });
+
+        btnAction.addEventListener('click', () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!email || !password) {
+                return showCustomToast('Please fill in all required fields.', 'System Validation');
+            }
+
+            if (isLoginMode) {
+                signInWithEmailAndPassword(auth, email, password)
+                    .then(() => { window.location.href = "index.html"; })
+                    .catch(error => showCustomToast(error.message, 'Authentication Failed'));
+            } else {
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(() => { 
+                        showCustomToast('Account created successfully! You can now log in.', 'Registration Success', true); 
+                        setTimeout(() => window.location.reload(), 2000);
+                    })
+                    .catch(error => showCustomToast(error.message, 'Registration Failed'));
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) { window.location.href = "index.html"; }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
