@@ -3,307 +3,499 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In — Sign Up</title>
+    <title>GNOKZ — Access</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green:        #00e55c;
+            --green-dim:    #00b848;
+            --green-glow:   rgba(0, 229, 92, 0.18);
+            --bg:           #010a04;
+            --card-bg:      rgba(3, 14, 7, 0.78);
+            --card-border:  rgba(0, 229, 92, 0.13);
+            --glass-hi:     rgba(255, 255, 255, 0.055);
+            --text:         #e6fded;
+            --muted:        rgba(210, 255, 225, 0.42);
+            --subtle:       rgba(210, 255, 225, 0.22);
+            --in-bg:        rgba(0, 229, 92, 0.045);
+            --in-border:    rgba(0, 229, 92, 0.14);
+            --in-focus:     rgba(0, 229, 92, 0.6);
+            --in-glow:      rgba(0, 229, 92, 0.1);
+        }
+
         body {
-            margin: 0; padding: 0;
-            font-family: 'Inter', Arial, sans-serif;
-            background: radial-gradient(circle at center, #121212 0%, #050505 100%);
-            color: #ffffff;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh;
-        }
-        .auth-container {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 40px; width: 320px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            text-align: center;
-            box-sizing: border-box;
-        }
-        h2 { 
-            color: #1db954; 
-            margin-top: 0;
-            margin-bottom: 24px; 
-            letter-spacing: 1px;
-        }
-        
-        /* STANDARD INPUT STYLING */
-        input {
-            width: 100%; 
-            padding: 14px 16px; 
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px; 
-            color: #fff; 
-            box-sizing: border-box;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-        input:focus {
-            outline: none;
-            border-color: #1db954;
-        }
-        
-        /* BULLETPROOF PASSWORD WRAPPER */
-        .password-wrapper {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
             position: relative;
-            width: 100%;
-            margin-bottom: 15px;
-            display: block;
-        }
-        .password-wrapper input {
-            margin-bottom: 0; /* Inalis para yung wrapper ang magdala ng spacing */
-            padding-right: 48px; /* Extra space sa kanan para di tamaan ng text yung icon */
-        }
-        .toggle-password-btn {
-            position: absolute;
-            right: 14px; /* Naka-lock sa kanang bahagi */
-            top: 50%;
-            transform: translateY(-50%); /* Para eksaktong gitna pataas-pababa */
-            background: transparent;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            color: #71717a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-        .toggle-password-btn:hover {
-            color: #ffffff;
         }
 
-        button#btn-action {
-            width: 100%; padding: 14px;
-            background: #1db954; border: none; border-radius: 8px;
-            color: #121212; font-weight: bold; cursor: pointer;
-            font-size: 15px;
-            margin-top: 5px;
-            transition: background 0.2s ease;
-        }
-        button#btn-action:hover {
-            background: #1ed760;
-        }
-
-        .toggle-text { margin-top: 20px; font-size: 13px; color: #b3b3b3; }
-        .toggle-text span { color: #1db954; cursor: pointer; text-decoration: none; font-weight: bold; }
-        .toggle-text span:hover { text-decoration: underline; }
-        
-        /* PREMIUM GLASSMORPHISM TOAST ALERT */
-        .custom-toast {
+        /* ─── Ambient orbs ─── */
+        .orb {
             position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            width: calc(100% - 40px);
-            max-width: 400px;
-            background: rgba(20, 20, 20, 0.85);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            z-index: 99999;
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-        }
-        .custom-toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .toast-icon {
-            width: 38px;
-            height: 38px;
-            background: rgba(255, 68, 68, 0.15);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ff4444;
+            filter: blur(90px);
+            pointer-events: none;
+        }
+        .orb-a {
+            width: 560px; height: 560px;
+            background: radial-gradient(circle, rgba(0,160,64,0.5) 0%, transparent 70%);
+            top: -160px; left: -140px;
+            animation: drift-a 14s ease-in-out infinite;
+        }
+        .orb-b {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(0,80,35,0.45) 0%, transparent 70%);
+            bottom: -100px; right: -80px;
+            animation: drift-b 17s ease-in-out infinite;
+        }
+        .orb-c {
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(0,229,92,0.28) 0%, transparent 70%);
+            top: 55%; left: 62%;
+            animation: drift-c 11s ease-in-out infinite;
+        }
+        @keyframes drift-a {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50%      { transform: translate(28px,44px) scale(1.07); }
+        }
+        @keyframes drift-b {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50%      { transform: translate(-22px,-32px) scale(1.05); }
+        }
+        @keyframes drift-c {
+            0%,100% { transform: translate(-50%,-50%) scale(1); }
+            50%      { transform: translate(-50%,-50%) scale(1.18); }
+        }
+
+        /* ─── Noise grain ─── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.022;
+        }
+
+        /* ─── Card ─── */
+        .card {
+            position: relative; z-index: 10;
+            width: 390px;
+            padding: 38px 34px 34px;
+            background: var(--card-bg);
+            backdrop-filter: blur(36px) saturate(140%);
+            -webkit-backdrop-filter: blur(36px) saturate(140%);
+            border: 1px solid var(--card-border);
+            border-radius: 26px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.025) inset,
+                0 1px 0 var(--glass-hi) inset,
+                0 36px 72px rgba(0,0,0,0.65),
+                0 0 100px rgba(0,150,60,0.07);
+        }
+        /* Top shimmer line */
+        .card::before {
+            content: '';
+            position: absolute; top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 55%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,229,92,0.55), transparent);
+        }
+
+        /* ─── Brand ─── */
+        .brand {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 30px;
+        }
+        .brand-mark {
+            width: 36px; height: 36px;
+            background: linear-gradient(140deg, #00e55c, #007a38);
+            border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 22px rgba(0,229,92,0.32);
             flex-shrink: 0;
         }
-        .toast-content { flex: 1; }
-        .toast-title { font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
-        .toast-message { font-size: 12.5px; color: #a1a1aa; line-height: 1.4; }
+        .brand-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px; font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--text);
+        }
+        .brand-label em { color: var(--green); font-style: normal; }
+
+        /* ─── Tab switcher ─── */
+        .tabs {
+            position: relative;
+            display: flex;
+            background: rgba(0,229,92,0.05);
+            border: 1px solid rgba(0,229,92,0.1);
+            border-radius: 13px;
+            padding: 4px;
+            margin-bottom: 28px;
+        }
+        .tab-pill {
+            position: absolute;
+            top: 4px; left: 4px;
+            height: calc(100% - 8px);
+            width: calc(50% - 4px);
+            background: linear-gradient(130deg, var(--green), var(--green-dim));
+            border-radius: 10px;
+            transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 2px 14px rgba(0,229,92,0.3);
+            pointer-events: none;
+        }
+        .tab-pill.right { transform: translateX(100%); }
+        .tab-btn {
+            flex: 1; padding: 10px 8px;
+            background: transparent; border: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
+            cursor: pointer;
+            color: var(--muted);
+            border-radius: 10px;
+            position: relative; z-index: 2;
+            transition: color 0.25s;
+        }
+        .tab-btn.active { color: #010a04; }
+
+        /* ─── Heading ─── */
+        .heading { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+        .subheading { font-size: 13px; color: var(--muted); margin-bottom: 26px; line-height: 1.55; }
+
+        /* ─── Fields ─── */
+        .field { margin-bottom: 15px; }
+        .field-label {
+            display: block;
+            font-size: 11px; font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+        .field-inner { position: relative; }
+        .field-icon {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--subtle);
+            display: flex; align-items: center;
+            pointer-events: none;
+            transition: color 0.22s;
+        }
+        .field-inner:focus-within .field-icon { color: var(--green); }
+
+        .field input {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            background: var(--in-bg);
+            border: 1px solid var(--in-border);
+            border-radius: 11px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.22s, box-shadow 0.22s;
+        }
+        .field input::placeholder { color: var(--subtle); }
+        .field input:focus {
+            outline: none;
+            border-color: var(--in-focus);
+            box-shadow: 0 0 0 3px var(--in-glow);
+        }
+        /* extra right padding for password field */
+        .field input.has-toggle { padding-right: 46px; }
+
+        .pw-toggle {
+            position: absolute; right: 13px; top: 50%;
+            transform: translateY(-50%);
+            background: none; border: none;
+            color: var(--subtle); cursor: pointer;
+            display: flex; align-items: center;
+            padding: 0;
+            transition: color 0.2s;
+        }
+        .pw-toggle:hover { color: var(--text); }
+
+        /* ─── CTA ─── */
+        .btn-cta {
+            width: 100%; padding: 14px;
+            margin-top: 6px;
+            background: linear-gradient(130deg, var(--green) 0%, var(--green-dim) 100%);
+            border: none; border-radius: 13px;
+            color: #010a04;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: transform 0.16s, box-shadow 0.22s;
+            box-shadow: 0 4px 28px rgba(0,229,92,0.28);
+            position: relative; overflow: hidden;
+        }
+        .btn-cta::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(160deg, rgba(255,255,255,0.14), transparent 55%);
+            border-radius: 13px; pointer-events: none;
+        }
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 36px rgba(0,229,92,0.42);
+        }
+        .btn-cta:active { transform: translateY(0); }
+
+        /* ─── Footer row ─── */
+        .footer-row {
+            display: flex; align-items: center; gap: 12px;
+            margin-top: 22px;
+        }
+        .footer-row::before, .footer-row::after {
+            content: ''; flex: 1; height: 1px;
+            background: var(--card-border);
+        }
+        .footer-text {
+            font-size: 12px; color: var(--subtle);
+            white-space: nowrap;
+        }
+        .footer-text .link {
+            color: var(--green); font-weight: 600;
+            cursor: pointer; margin-left: 3px;
+        }
+        .footer-text .link:hover { text-decoration: underline; }
+
+        /* ─── Toast ─── */
+        .toast {
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%) translateY(-130px);
+            min-width: 300px; max-width: 430px;
+            background: rgba(3,12,6,0.94);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255,68,68,0.22);
+            border-radius: 18px; padding: 14px 18px;
+            display: flex; align-items: center; gap: 14px;
+            z-index: 9999; pointer-events: none; opacity: 0;
+            box-shadow: 0 18px 48px rgba(0,0,0,0.55);
+            transition: transform 0.42s cubic-bezier(0.175,0.885,0.32,1.275), opacity 0.3s;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+        .toast.success { border-color: rgba(0,229,92,0.28); }
+
+        .toast-ico {
+            width: 36px; height: 36px; flex-shrink: 0;
+            border-radius: 50%;
+            background: rgba(255,68,68,0.1);
+            color: #ff5555;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .toast.success .toast-ico { background: rgba(0,229,92,0.1); color: var(--green); }
+
+        .toast-copy {}
+        .toast-ttl {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px; font-weight: 700;
+            color: var(--text); margin-bottom: 2px;
+        }
+        .toast-msg {
+            font-size: 12px; color: var(--muted); line-height: 1.45;
+        }
     </style>
 </head>
 <body>
 
-    <div class="auth-container">
-        <h2 id="auth-title">LOG IN</h2>
-        
-        <input type="email" id="email" placeholder="Email Address" required>
-        
-        <div class="password-wrapper">
-            <input type="password" id="password" placeholder="Password (6+ chars)" required>
-            <button type="button" class="toggle-password-btn" id="toggle-password" title="Toggle Password Visibility">
-                <i data-lucide="eye" id="eye-icon" style="width: 18px; height: 18px;"></i>
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+<div class="orb orb-c"></div>
+
+<div class="card">
+
+    <!-- Brand -->
+    <div class="brand">
+        <div class="brand-mark">
+            <i data-lucide="zap" style="width:17px;height:17px;color:#010a04;stroke-width:2.5;"></i>
+        </div>
+        <span class="brand-label">GNOKZ&nbsp;<em>PRO</em></span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab-pill" id="tab-pill"></div>
+        <button class="tab-btn active" id="tab-login">Sign In</button>
+        <button class="tab-btn" id="tab-signup">Create Account</button>
+    </div>
+
+    <!-- Heading -->
+    <h2 class="heading" id="heading">Welcome back</h2>
+    <p class="subheading" id="subheading">Sign in to continue to your account.</p>
+
+    <!-- Email -->
+    <div class="field">
+        <label class="field-label" for="email">Email Address</label>
+        <div class="field-inner">
+            <span class="field-icon"><i data-lucide="mail" style="width:15px;height:15px;"></i></span>
+            <input type="email" id="email" placeholder="you@example.com">
+        </div>
+    </div>
+
+    <!-- Password -->
+    <div class="field">
+        <label class="field-label" for="password">Password</label>
+        <div class="field-inner">
+            <span class="field-icon"><i data-lucide="lock" style="width:15px;height:15px;"></i></span>
+            <input type="password" id="password" class="has-toggle" placeholder="At least 6 characters">
+            <button class="pw-toggle" id="pw-toggle" type="button" aria-label="Toggle password visibility">
+                <i data-lucide="eye" id="eye-icon" style="width:16px;height:16px;"></i>
             </button>
         </div>
-
-        <button id="btn-action">Sign In</button>
-        <p class="toggle-text" id="toggle-mode">
-            New here? <span id="toggle-link">Create an Account</span>
-        </p>
-    </div>
-    
-    <div class="custom-toast" id="toast-notification">
-        <div class="toast-icon" id="toast-icon-box">
-            <i data-lucide="alert-circle" style="width: 20px; height: 20px;"></i>
-        </div>
-        <div class="toast-content">
-            <div class="toast-title" id="toast-header-title">System Notice</div>
-            <div class="toast-message" id="toast-body-text">Something went wrong.</div>
-        </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    <!-- CTA -->
+    <button class="btn-cta" id="btn-action">Sign In</button>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBUDPbyvZI7RShBr3ozBk06GfI7V4hSpmE",
-            authDomain: "gnokz-pro.firebaseapp.com",
-            projectId: "gnokz-pro",
-            storageBucket: "gnokz-pro.firebasestorage.app",
-            messagingSenderId: "88912267824",
-            appId: "1:88912267824:web:64075cc3a81a94e14e3bf5",
-            measurementId: "G-NG3DXEJ2Y4"
-        };
+    <!-- Footer -->
+    <div class="footer-row">
+        <span class="footer-text">
+            <span id="footer-txt">No account?</span>
+            <span class="link" id="toggle-link">Create one</span>
+        </span>
+    </div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+</div>
 
-        const authTitle = document.getElementById('auth-title');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const btnAction = document.getElementById('btn-action');
-        const toggleLink = document.getElementById('toggle-link');
-        const togglePasswordBtn = document.getElementById('toggle-password');
-        const eyeIcon = document.getElementById('eye-icon');
+<!-- Toast -->
+<div class="toast" id="toast">
+    <div class="toast-ico" id="toast-ico">
+        <i data-lucide="alert-circle" style="width:17px;height:17px;"></i>
+    </div>
+    <div class="toast-copy">
+        <div class="toast-ttl" id="toast-ttl">Notice</div>
+        <div class="toast-msg" id="toast-msg">Something went wrong.</div>
+    </div>
+</div>
 
-        let isLoginMode = true;
-        let toastTimeout = null;
+<script type="module">
+    import { initializeApp }                from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword,
+             signInWithEmailAndPassword, onAuthStateChanged }
+                                            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // EYE TOGGLE VISIBILITY SCRIPT
-        togglePasswordBtn.addEventListener('click', () => {
-            const isPassword = passwordInput.getAttribute('type') === 'password';
-            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-            eyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        });
+    const firebaseConfig = {
+        apiKey:            "AIzaSyBUDPbyvZI7RShBr3ozBk06GfI7V4hSpmE",
+        authDomain:        "gnokz-pro.firebaseapp.com",
+        projectId:         "gnokz-pro",
+        storageBucket:     "gnokz-pro.firebasestorage.app",
+        messagingSenderId: "88912267824",
+        appId:             "1:88912267824:web:64075cc3a81a94e14e3bf5",
+        measurementId:     "G-NG3DXEJ2Y4"
+    };
 
-        // MASTER CUSTOM TOAST TRIGGER LOGIC
-        window.showCustomToast = function(message, title = "Login Security Notice", isSuccess = false) {
-            const toast = document.getElementById('toast-notification');
-            const toastTitle = document.getElementById('toast-header-title');
-            const toastText = document.getElementById('toast-body-text');
-            const iconBox = document.getElementById('toast-icon-box');
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-            toastTitle.innerText = title;
-            
-            if (message.includes("auth/invalid-credential") || message.includes("invalid-credential")) {
-                toastText.innerText = "Invalid email or password. Please verify and try again.";
-            } else if (message.includes("auth/missing-password") || message.includes("missing-password")) {
-                toastText.innerText = "Password field is empty. Please enter your account password.";
-            } else if (message.includes("auth/weak-password")) {
-                toastText.innerText = "The security password is too weak. It must be at least 6 characters long.";
-            } else if (message.includes("auth/invalid-email")) {
-                toastText.innerText = "The provided email address format is invalid.";
-            } else if (message.includes("auth/email-already-in-use")) {
-                toastText.innerText = "This email is already registered. Please proceed to sign in instead.";
-            } else {
-                toastText.innerText = message;
-            }
+    // ── Elements ──
+    const tabLogin  = document.getElementById('tab-login');
+    const tabSignup = document.getElementById('tab-signup');
+    const tabPill   = document.getElementById('tab-pill');
+    const heading   = document.getElementById('heading');
+    const subhead   = document.getElementById('subheading');
+    const emailEl   = document.getElementById('email');
+    const passEl    = document.getElementById('password');
+    const btnAction = document.getElementById('btn-action');
+    const pwToggle  = document.getElementById('pw-toggle');
+    const eyeIcon   = document.getElementById('eye-icon');
+    const footerTxt = document.getElementById('footer-txt');
+    const toggleLnk = document.getElementById('toggle-link');
 
-            if (isSuccess) {
-                toast.style.borderColor = "rgba(30, 215, 96, 0.35)";
-                iconBox.style.background = "rgba(30, 215, 96, 0.15)";
-                iconBox.style.color = "#1ed760";
-                iconBox.innerHTML = '<i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>';
-            } else {
-                toast.style.borderColor = "rgba(255, 68, 68, 0.35)";
-                iconBox.style.background = "rgba(255, 68, 68, 0.15)";
-                iconBox.style.color = "#ff4444";
-                iconBox.innerHTML = '<i data-lucide="alert-circle" style="width: 20px; height: 20px;"></i>';
-            }
+    let loginMode    = true;
+    let toastTimer;
 
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            toast.classList.add('show');
+    // ── Mode switch ──
+    function setMode(login) {
+        loginMode = login;
+        tabPill.classList.toggle('right', !login);
+        tabLogin.classList.toggle('active', login);
+        tabSignup.classList.toggle('active', !login);
+        heading.innerText  = login ? 'Welcome back'                   : 'Create account';
+        subhead.innerText  = login ? 'Sign in to continue to your account.' : 'Join GNOKZ Pro — it only takes a moment.';
+        btnAction.innerText = login ? 'Sign In'  : 'Register';
+        footerTxt.innerText = login ? 'No account?'                   : 'Already registered?';
+        toggleLnk.innerText = login ? 'Create one'                    : 'Sign in';
+    }
 
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 4500);
-        };
+    tabLogin.addEventListener('click',  () => setMode(true));
+    tabSignup.addEventListener('click', () => setMode(false));
+    toggleLnk.addEventListener('click', () => setMode(!loginMode));
 
-        // LOGIN / SIGNUP MODE CONTROLLER
-        function updateAuthUI() {
-            if (isLoginMode) {
-                authTitle.innerText = "LOG IN";
-                btnAction.innerText = "Sign In";
-                document.getElementById('toggle-mode').innerHTML = 'New here? <span id="toggle-link">Create an Account</span>';
-            } else {
-                authTitle.innerText = "SIGN UP";
-                btnAction.innerText = "Register";
-                document.getElementById('toggle-mode').innerHTML = 'Already have an account? <span id="toggle-link">Log in here</span>';
-            }
-            document.getElementById('toggle-link').addEventListener('click', () => {
-                isLoginMode = !isLoginMode;
-                updateAuthUI();
-            });
+    // ── Password visibility ──
+    pwToggle.addEventListener('click', () => {
+        const show = passEl.type === 'password';
+        passEl.type = show ? 'text' : 'password';
+        eyeIcon.setAttribute('data-lucide', show ? 'eye-off' : 'eye');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+
+    // ── Toast ──
+    const ERROR_MAP = {
+        'auth/invalid-credential':  'Invalid email or password. Double-check and try again.',
+        'invalid-credential':       'Invalid email or password. Double-check and try again.',
+        'auth/missing-password':    'Password field is empty.',
+        'missing-password':         'Password field is empty.',
+        'auth/weak-password':       'Password must be at least 6 characters.',
+        'auth/invalid-email':       'The email address format is invalid.',
+        'auth/email-already-in-use':'This email is already registered — sign in instead.',
+    };
+
+    function showToast(raw, title = 'Notice', success = false) {
+        const toast    = document.getElementById('toast');
+        const ico      = document.getElementById('toast-ico');
+        const ttl      = document.getElementById('toast-ttl');
+        const msg      = document.getElementById('toast-msg');
+        const resolved = Object.entries(ERROR_MAP).find(([k]) => raw.includes(k));
+
+        ttl.innerText  = title;
+        msg.innerText  = resolved ? resolved[1] : raw;
+        toast.classList.toggle('success', success);
+
+        ico.innerHTML = `<i data-lucide="${success ? 'check-circle' : 'alert-circle'}" style="width:17px;height:17px;"></i>`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 4500);
+    }
+
+    // ── Auth ──
+    btnAction.addEventListener('click', () => {
+        const email    = emailEl.value.trim();
+        const password = passEl.value.trim();
+        if (!email || !password)
+            return showToast('Please fill in all required fields.', 'Validation');
+
+        if (loginMode) {
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => { window.location.href = 'index.html'; })
+                .catch(err => showToast(err.message, 'Sign In Failed'));
+        } else {
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    showToast('Account created! Redirecting you now…', 'Success', true);
+                    setTimeout(() => window.location.reload(), 2200);
+                })
+                .catch(err => showToast(err.message, 'Registration Failed'));
         }
+    });
 
-        document.getElementById('toggle-link').addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            updateAuthUI();
-        });
-
-        btnAction.addEventListener('click', () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            if (!email || !password) {
-                return showCustomToast('Please fill in all required fields.', 'System Validation');
-            }
-
-            if (isLoginMode) {
-                signInWithEmailAndPassword(auth, email, password)
-                    .then(() => { window.location.href = "index.html"; })
-                    .catch(error => showCustomToast(error.message, 'Authentication Failed'));
-            } else {
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then(() => { 
-                        showCustomToast('Account created successfully! You can now log in.', 'Registration Success', true); 
-                        setTimeout(() => window.location.reload(), 2000);
-                    })
-                    .catch(error => showCustomToast(error.message, 'Registration Failed'));
-            }
-        });
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) { window.location.href = "index.html"; }
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        });
-    </script>
+    onAuthStateChanged(auth, user => {
+        if (user) window.location.href = 'index.html';
+    });
+</script>
 </body>
 </html>
