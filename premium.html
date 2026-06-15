@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gnokz Music</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-deep: #030305;
+            --brand-green: #1db954;
+            --brand-glow: rgba(29, 185, 84, 0.35);
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+            
+            /* High-End Luxury Glassmorphism Specs */
+            --glass-surface: rgba(255, 255, 255, 0.03);
+            --glass-surface-hover: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --card-inner-glow: rgba(29, 185, 84, 0.08);
+            --shadow-premium: box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            letter-spacing: -0.2px;
+        }
+
+        /* Ambient Fluid Mesh Background */
+        .liquid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #06150e 0%, #030305 100%);
+        }
+
+        .liquid-fluid {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.45;
+            animation: fluidMorph 25s infinite alternate ease-in-out;
+        }
+        .fluid-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(29, 185, 84, 0.2) 0%, transparent 80%); top: -200px; left: -150px; }
+        .fluid-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(0, 180, 216, 0.1) 0%, transparent 80%); bottom: -150px; right: -100px; }
+
+        @keyframes fluidMorph {
+            0% { transform: translate(0px, 0px) scale(1) rotate(0deg); border-radius: 40% 60% 50% 50%; }
+            100% { transform: translate(60px, -40px) scale(1.1) rotate(60deg); border-radius: 60% 40% 60% 40%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 460px;
+            padding: 40px 24px;
+            box-sizing: border-box;
+            margin-bottom: 120px;
+        }
+
+        /* Luxury Header Setup */
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        
+        /* Glassmorphism Text Button Style */
+        .back-luxury-btn {
+            background: var(--glass-surface);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            color: var(--text-main);
+            border-radius: 14px; 
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .back-luxury-btn:hover { background: var(--glass-surface-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
+        .back-luxury-btn:active { transform: translateY(0) scale(0.98); }
+
+        h2 { font-size: 26px; font-weight: 800; margin: 0; background: linear-gradient(180deg, #ffffff 40%, #a2a2a2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+        .premium-tagline { color: var(--text-muted); font-size: 11px; font-weight: 700; margin-top: 6px; margin-bottom: 30px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; }
+
+        /* Premium Showroom Grid */
+        .showroom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 30px; }
+        
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 22px; padding: 28px 16px; text-align: center; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.15), transparent 60%);
+            opacity: 0; transition: opacity 0.4s ease; z-index: 0;
+        }
+        .glass-card:hover { transform: translateY(-6px); background: rgba(255, 255, 255, 0.05); box-shadow: 0 20px 40px rgba(29, 185, 84, 0.15); }
+        .glass-card:hover::before { opacity: 1; }
+        .glass-card:active { transform: translateY(-2px) scale(0.98); }
+        
+        .card-title { font-size: 18px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; position: relative; z-index: 1; }
+        .card-status { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--brand-green); margin-top: 6px; opacity: 0.8; position: relative; z-index: 1; text-shadow: 0 0 10px var(--brand-glow); }
+
+        /* Premium Track List Deck */
+        .premium-track-container {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 28px; padding: 16px; min-height: 220px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+            margin-bottom: 24px;
+        }
+
+        /* Elegant Row Architecture */
+        .track-luxury-item {
+            position: relative;
+            display: flex; align-items: center; gap: 16px; padding: 14px; border-radius: 20px; cursor: pointer; margin-bottom: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid transparent;
+        }
+        .track-luxury-item:hover { background: rgba(255, 255, 255, 0.04); transform: translateX(4px); }
+        
+        .track-luxury-item.active-highlight {
+            background: linear-gradient(90deg, rgba(29, 185, 84, 0.08) 0%, rgba(255,255,255,0.01) 100%) !important;
+            border: 1px solid rgba(29, 185, 84, 0.2);
+            box-shadow: inset 0 0 15px rgba(29, 185, 84, 0.05);
+        }
+
+        .track-luxury-thumb { width: 52px; height: 52px; border-radius: 14px; object-fit: cover; background: #111113; box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: transform 0.3s; }
+        .track-luxury-item.active-highlight .track-luxury-thumb { transform: scale(1.05); box-shadow: 0 8px 20px rgba(29, 185, 84, 0.25); }
+        
+        .track-luxury-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+        
+        .track-title-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .track-luxury-title { font-weight: 600; font-size: 15px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-luxury-item.active-highlight .track-luxury-title { color: var(--brand-green); }
+        .track-luxury-author { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+        /* Integrated Inline Progress Node */
+        .inline-track-progress-bar {
+            width: 100%; height: 3px; background: rgba(255, 255, 255, 0.06); border-radius: 10px; margin-top: 10px;
+            display: none; position: relative; overflow: hidden;
+        }
+        .track-luxury-item.active-highlight .inline-track-progress-bar { display: block; }
+        .inline-track-progress-fill { height: 100%; width: 0%; background: var(--brand-green); border-radius: 10px; }
+
+        #showroom-hidden-player { display: none; }
+
+        /* Floating Studio Bottom Controller */
+        .floating-bottom-deck-wrapper {
+            position: fixed; bottom: 20px; left: 50%; transform: translate(-50%, 20px);
+            width: calc(100% - 40px); max-width: 420px; z-index: 999;
+            opacity: 0; pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .floating-bottom-deck-wrapper.visible { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+
+        .floating-deck-card {
+            background: rgba(14, 16, 20, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px; padding: 12px 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.02);
+            display: flex; align-items: center; gap: 14px; cursor: pointer;
+            position: relative; overflow: hidden;
+        }
+        .floating-deck-card:active { transform: scale(0.99); }
+
+        .deck-art-frame { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; background: #09090b; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .deck-core-meta { flex: 1; min-width: 0; }
+        .deck-status-indicator { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--brand-green); opacity: 0.9; }
+        .deck-track-name { font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .deck-track-author { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .deck-control-node {
+            background: #ffffff; color: #000000; border: none; width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 4px 10px rgba(255,255,255,0.2);
+        }
+        .deck-control-node:hover { transform: scale(1.08); }
+        .deck-control-node:active { transform: scale(0.92); }
+
+        .deck-base-progress-wire {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.04);
+        }
+        .deck-base-progress-fill { height: 100%; width: 0%; background: var(--brand-green); transition: width 0.1s linear; }
+
+        /* Full Screen Luxury Overlays */
+        .premium-music-card-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 3, 5, 0.82);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            z-index: 10000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .premium-music-card-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .luxury-card-frame {
+            width: calc(100% - 40px); max-width: 400px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px; padding: 28px; box-sizing: border-box;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+            transform: translateY(50px) scale(0.95); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .premium-music-card-overlay.active .luxury-card-frame { transform: translateY(0) scale(1); }
+
+        .card-dismiss-trigger {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); width: 44px; height: 44px;
+            border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px auto; cursor: pointer; transition: all 0.3s;
+        }
+        .card-dismiss-trigger:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+
+        .card-main-visual-box {
+            position: relative; width: 100%; aspect-ratio: 1; border-radius: 28px;
+            overflow: hidden; background: #0f0f12; box-shadow: 0 20px 50px rgba(0,0,0,0.6); margin-bottom: 28px;
+        }
+        .card-artwork-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .card-embedded-watermark {
+            position: absolute; bottom: 18px; right: 18px; background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(15px); border-radius: 20px; padding: 6px 14px;
+            display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+        }
+
+        .card-track-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding: 0 4px; }
+        .card-meta-left { min-width: 0; width: 100%; }
+        .card-tag-sub { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--brand-green); letter-spacing: 1.5px; text-shadow: 0 0 8px var(--brand-glow); }
+        .card-track-name { font-size: 23px; font-weight: 800; color: #fff; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px; }
+        .card-track-author { font-size: 15px; color: var(--text-muted); margin-top: 2px; }
+
+        /* Premium Custom Timeline Scrubber */
+        .card-timeline-slider { width: 100%; margin-bottom: 30px; padding: 0 4px; box-sizing: border-box; }
+        .slider-rail { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 10px; position: relative; cursor: pointer; }
+        .slider-fluid-fill { height: 100%; width: 0%; background: var(--brand-green); border-radius: 10px; position: absolute; left: 0; top: 0; box-shadow: 0 0 10px var(--brand-glow); }
+        .slider-handle-bubble {
+            width: 14px; height: 14px; background: #ffffff; border-radius: 50%;
+            position: absolute; top: 50%; left: 0%; transform: translate(-50%, -50%) scale(0);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: transform 0.2s;
+        }
+        .slider-rail:hover .slider-handle-bubble { transform: translate(-50%, -50%) scale(1); }
+        .slider-time-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); font-family: -apple-system, sans-serif; font-weight: 500; margin-top: 10px; }
+
+        /* Premium Spatial Controller Buttons */
+        .card-controls-block { display: flex; align-items: center; justify-content: center; }
+        .card-center-cluster { display: flex; align-items: center; gap: 36px; }
+        .card-skip-btn { background: none; border: none; color: #ffffff; cursor: pointer; transition: all 0.2s; padding: 10px; opacity: 0.8; }
+        .card-skip-btn:hover { transform: scale(1.15); opacity: 1; }
+        .card-skip-btn:active { transform: scale(0.9); }
+        
+        .card-master-action {
+            background: #ffffff; color: #000000; border: none; width: 64px; height: 64px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255,255,255,0.25); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .card-master-action:hover { transform: scale(1.08); box-shadow: 0 12px 30px rgba(255,255,255,0.4); }
+        .card-master-action:active { transform: scale(0.92); }
+    </style>
+</head>
+<body>
+
+<div class="liquid-canvas">
+    <div class="liquid-fluid fluid-1"></div>
+    <div class="liquid-fluid fluid-2"></div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>Gnokz Exclusive</h2>
+        <!-- Header Luxury Go Back Button (Main Navigation) -->
+        <button class="back-luxury-btn" onclick="window.location.href='index.html'">
+            <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+            <span>Go Back</span>
+        </button>
+    </div>
+    <div class="premium-tagline">Select playlists to stream.</div>
+
+    <div class="showroom-grid">
+        <div class="glass-card opm-card" onclick="ShowroomEngine.fetchPlaylist('RDATfhZmlsaXBpbm8')">
+            <div class="card-title">OPM</div><div class="card-status">Stream</div>
+        </div>
+        <div class="glass-card edm-card" onclick="ShowroomEngine.fetchPlaylist('PL4fGSI1pDJn6jRE0SxrWbw1Weffg88E_8')">
+            <div class="card-title">EDM</div><div class="card-status">Stream</div>
+        </div>
+        <div class="glass-card rock-card" onclick="ShowroomEngine.fetchPlaylist('PL3-sRm8ssiYp_kS6z6TfB9b8P8r_Z0w5X')">
+            <div class="card-title">ROCK</div><div class="card-status">Stream</div>
+        </div>
+        <div class="glass-card oms-card" onclick="ShowroomEngine.fetchPlaylist('PL3-sRm8ssiYrV4hN7fA6b2Hh83y-O_pPq')">
+            <div class="card-title">OMS</div><div class="card-status">Stream</div>
+        </div>
+    </div>
+
+    <div class="premium-track-container" id="showroom-tracks">
+        <div style="text-align: center; color: var(--text-muted); padding: 60px 10px; font-size: 13px; font-weight: 500;">
+            CHOSE PLAYLISTS ABOVE
+        </div>
+    </div>
+</div>
+
+<div id="showroom-hidden-player"></div>
+
+<div class="floating-bottom-deck-wrapper" id="floating-deck-wrapper">
+    <div class="floating-deck-card" onclick="ShowroomEngine.openPlayerCardOverlay()">
+        <img class="deck-art-frame" id="deck-hero-thumb" src="">
+        <div class="deck-core-meta">
+            <div class="deck-status-indicator" id="deck-status-label">GNOKZ • ARCHIVE STREAM</div>
+            <div class="deck-track-name" id="deck-hero-title">Track Title</div>
+            <div class="deck-track-author" id="deck-hero-author">Artist Name</div>
+        </div>
+        <button class="deck-control-node" onclick="event.stopPropagation(); ShowroomEngine.togglePlayback();">
+            <i data-lucide="play" id="deck-micro-play-icon" style="width:16px; height:16px; fill:#000;"></i>
+        </button>
+        <div class="deck-base-progress-wire">
+            <div class="deck-base-progress-fill" id="deck-wire-fill"></div>
+        </div>
+    </div>
+</div>
+
+<div class="premium-music-card-overlay" id="luxury-card-overlay">
+    <div class="luxury-card-frame">
+        
+        <button class="card-dismiss-trigger" onclick="ShowroomEngine.closePlayerCardOverlay()">
+            <i data-lucide="chevron-down" style="width: 22px; height: 22px;"></i>
+        </button>
+
+        <div class="card-main-visual-box">
+            <img class="card-artwork-img" id="card-hero-thumb" src="">
+            <div class="card-embedded-watermark">
+                <i data-lucide="youtube" style="width:14px; height:14px; color:#ff0000; fill:#ff0000;"></i>
+                <span>GNOKZ PRO</span>
+            </div>
+        </div>
+
+        <div class="card-track-meta">
+            <div class="card-meta-left">
+                <div class="card-tag-sub" id="playback-status-label">GNOKZ • ARCHIVE STREAM</div>
+                <div class="card-track-name" id="card-hero-title">Track Name Placeholder</div>
+                <div class="card-track-author" id="card-hero-author">Author Placeholder</div>
+            </div>
+        </div>
+
+        <div class="card-timeline-slider">
+            <div class="slider-rail" onclick="ShowroomEngine.scrubTimeline(event)">
+                <div class="slider-fluid-fill" id="card-progress-fill"></div>
+                <div class="slider-handle-bubble" id="card-progress-bubble"></div>
+            </div>
+            <div class="slider-time-row">
+                <div id="card-time-current">0:00</div>
+                <div id="card-time-total">0:00</div>
+            </div>
+        </div>
+
+        <div class="card-controls-block">
+            <div class="card-center-cluster">
+                <button class="card-skip-btn" onclick="ShowroomEngine.prevTrack()"><i data-lucide="skip-back" style="width:26px; height:26px; fill:#fff;"></i></button>
+                <button class="card-master-action" onclick="ShowroomEngine.togglePlayback()"><i data-lucide="play" id="card-master-play-icon" style="width:24px; height:24px; fill:#000;"></i></button>
+                <button class="card-skip-btn" onclick="ShowroomEngine.nextTrack()"><i data-lucide="skip-forward" style="width:26px; height:26px; fill:#fff;"></i></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    let ytPlayer;
+    let progressTimer;
+
+    function onYouTubeIframeAPIReady() {
+        ytPlayer = new YT.Player('showroom-hidden-player', {
+            height: '0', width: '0', videoId: '',
+            playerVars: { 'playsinline': 1, 'controls': 0 },
+            events: {
+                'onStateChange': onPlayerStateChange,
+                'onReady': onPlayerReady
+            }
+        });
+    }
+
+    function onPlayerStateChange(event) {
+        if (event.data === YT.PlayerState.ENDED) { 
+            ShowroomEngine.nextTrack(); 
+        } else if (event.data === YT.PlayerState.PLAYING) {
+            ShowroomEngine.isPlaying = true;
+            ShowroomEngine.initiateTimelineLoop();
+        } else if (event.data === YT.PlayerState.PAUSED) {
+            ShowroomEngine.isPlaying = false;
+            ShowroomEngine.killTimelineLoop();
+        }
+        ShowroomEngine.refreshPlayStateIcon();
+    }
+
+    function onPlayerReady() {
+        // Core playback stream array ready
+    }
+
+    const ShowroomEngine = {
+        apiKey: "AIzaSyA58g8LJy4f_TiLuv-w61c8vEkq0TJnKhw",
+        queue: [],
+        currentIndex: -1,
+        isPlaying: false,
+
+        async fetchPlaylist(playlistId) {
+            const container = document.getElementById('showroom-tracks');
+            container.innerHTML = `<div style="text-align:center; padding:60px; color:var(--brand-green); font-size:13px; font-weight:700; letter-spacing:1px;">PLAYLIST DETECTED</div>`;
+            
+            const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${this.apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+
+                if (data.items && data.items.length > 0) {
+                    this.queue = data.items
+                        .filter(item => item.snippet.title !== "Deleted video" && item.snippet.title !== "Private video")
+                        .map(item => ({
+                            id: item.snippet.resourceId.videoId,
+                            title: item.snippet.title,
+                            author: item.snippet.videoOwnerChannelTitle || "Gnokz Premium Suite",
+                            thumb: `https://i.ytimg.com/vi/${item.snippet.resourceId.videoId}/mqdefault.jpg`
+                        }));
+                    this.renderShowroomTracks();
+                } else {
+                    container.innerHTML = `<div style="text-align:center; padding:60px; color:#ff4444; font-size:12px;">EMPTY STREAM ARCHIVE</div>`;
+                }
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div style="text-align:center; padding:60px; color:#ff4444; font-size:12px;">Coming up soon</div>`;
+            }
+        },
+
+        renderShowroomTracks() {
+            const container = document.getElementById('showroom-tracks');
+            container.innerHTML = '';
+            
+            this.queue.forEach((track, index) => {
+                const div = document.createElement('div');
+                div.className = 'track-luxury-item';
+                div.id = `track-item-${index}`;
+                div.onclick = () => this.executeTrackSelection(index);
+                
+                div.innerHTML = `
+                    <img class="track-luxury-thumb" src="${track.thumb}">
+                    <div class="track-luxury-info">
+                        <div class="track-title-row">
+                            <div class="track-luxury-title">${track.title}</div>
+                        </div>
+                        <div class="track-luxury-author">${track.author}</div>
+                        <div class="inline-track-progress-bar">
+                            <div class="inline-track-progress-fill" id="inline-fill-${index}"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            this.syncActiveTrackHighlight();
+            lucide.createIcons();
+        },
+
+        executeTrackSelection(index) {
+            if (index < 0 || index >= this.queue.length) return;
+            this.currentIndex = index;
+            const track = this.queue[index];
+
+            document.getElementById('card-hero-title').innerText = track.title;
+            document.getElementById('card-hero-author').innerText = track.author;
+            document.getElementById('card-hero-thumb').src = track.thumb;
+
+            document.getElementById('deck-hero-title').innerText = track.title;
+            document.getElementById('deck-hero-author').innerText = track.author;
+            document.getElementById('deck-hero-thumb').src = track.thumb;
+
+            document.getElementById('floating-deck-wrapper').classList.add('visible');
+
+            this.syncActiveTrackHighlight();
+
+            ytPlayer.loadVideoById(track.id);
+            this.isPlaying = true;
+            this.refreshPlayStateIcon();
+        },
+
+        syncActiveTrackHighlight() {
+            document.querySelectorAll('.track-luxury-item').forEach(el => {
+                el.classList.remove('active-highlight');
+            });
+            const activeElem = document.getElementById(`track-item-${this.currentIndex}`);
+            if (activeElem) {
+                activeElem.classList.add('active-highlight');
+            }
+        },
+
+        openPlayerCardOverlay() {
+            if (this.currentIndex === -1) return;
+            document.getElementById('luxury-card-overlay').classList.add('active');
+        },
+
+        closePlayerCardOverlay() {
+            document.getElementById('luxury-card-overlay').classList.remove('active');
+        },
+
+        togglePlayback() {
+            if (this.currentIndex === -1) return;
+            if (this.isPlaying) {
+                ytPlayer.pauseVideo();
+                this.isPlaying = false;
+            } else {
+                ytPlayer.playVideo();
+                this.isPlaying = true;
+            }
+            this.refreshPlayStateIcon();
+        },
+
+        nextTrack() {
+            if (this.queue.length === 0) return;
+            let target = this.currentIndex < this.queue.length - 1 ? this.currentIndex + 1 : 0;
+            this.executeTrackSelection(target);
+        },
+
+        prevTrack() {
+            if (this.queue.length === 0) return;
+            let target = this.currentIndex > 0 ? this.currentIndex - 1 : this.queue.length - 1;
+            this.executeTrackSelection(target);
+        },
+
+        refreshPlayStateIcon() {
+            const mainIcon = document.getElementById('card-master-play-icon');
+            const miniIcon = document.getElementById('deck-micro-play-icon');
+            const overlayLabel = document.getElementById('playback-status-label');
+            const deckLabel = document.getElementById('deck-status-label');
+
+            if (this.isPlaying) {
+                mainIcon.setAttribute('data-lucide', 'pause');
+                miniIcon.setAttribute('data-lucide', 'pause');
+                overlayLabel.innerText = "GNOKZ • NOW PLAYING";
+                deckLabel.innerText = "GNOKZ • NOW PLAYING";
+            } else {
+                mainIcon.setAttribute('data-lucide', 'play');
+                miniIcon.setAttribute('data-lucide', 'play');
+                overlayLabel.innerText = "GNOKZ • NOT PLAYING";
+                deckLabel.innerText = "GNOKZ • NOT PLAYING";
+            }
+            lucide.createIcons();
+        },
+
+        formatTimeLayout(seconds) {
+            if (isNaN(seconds) || seconds < 0) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        },
+
+        initiateTimelineLoop() {
+            this.killTimelineLoop();
+            progressTimer = setInterval(() => {
+                if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function' && this.isPlaying) {
+                    this.updateTimelineTracks();
+                }
+            }, 100);
+        },
+
+        killTimelineLoop() {
+            if (progressTimer) clearInterval(progressTimer);
+        },
+
+        updateTimelineTracks() {
+            const current = ytPlayer.getCurrentTime();
+            const total = ytPlayer.getDuration();
+            
+            if (total > 0 && !isNaN(current)) {
+                const percentage = (current / total) * 100;
+
+                // A. Master Panel Trackers
+                document.getElementById('card-progress-fill').style.width = `${percentage}%`;
+                document.getElementById('card-progress-bubble').style.left = `${percentage}%`;
+                document.getElementById('card-time-current').innerText = this.formatTimeLayout(current);
+                document.getElementById('card-time-total').innerText = this.formatTimeLayout(total);
+
+                // B. Mini Deck Sticky Strip
+                document.getElementById('deck-wire-fill').style.width = `${percentage}%`;
+
+                // C. List Row Active Highlights
+                const inlineFill = document.getElementById(`inline-fill-${this.currentIndex}`);
+                if (inlineFill) inlineFill.style.width = `${percentage}%`;
+            }
+        },
+
+        scrubTimeline(event) {
+            if (!ytPlayer || this.currentIndex === -1) return;
+            const rail = event.currentTarget;
+            const rect = rail.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+            const totalDuration = ytPlayer.getDuration();
+            
+            if (totalDuration > 0) {
+                const targetTime = totalDuration * percentage;
+                ytPlayer.seekTo(targetTime, true);
+                document.getElementById('card-progress-fill').style.width = `${percentage * 100}%`;
+                document.getElementById('card-progress-bubble').style.left = `${percentage * 100}%`;
+            }
+        }
+    };
+
+    lucide.createIcons();
+</script>
+</body>
+</html>

@@ -311,9 +311,9 @@
         .header-actions { display: flex; gap: 12px; }
 
         .tab-container { background: rgba(255,255,255,0.03); border: 1px solid var(--border-light); border-radius: var(--radius-pill); display: flex; position: relative; padding: 4px; margin-bottom: 24px; backdrop-filter: blur(20px); }
-        .tab { flex: 1; text-align: center; padding: 10px 0; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; z-index: 2; transition: color var(--ease); border-radius: var(--radius-pill); }
+        .tab { flex: 1; text-align: center; padding: 10px 0; font-size: 11px; font-weight: 600; color: var(--text-secondary); cursor: pointer; z-index: 2; transition: color var(--ease); border-radius: var(--radius-pill); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .tab.active { color: var(--text-primary); }
-        .tab-slider { position: absolute; top: 4px; bottom: 4px; width: calc(25% - 2px); background: rgba(255,255,255,0.1); border-radius: var(--radius-pill); transition: transform var(--spring); z-index: 1; }
+        .tab-slider { position: absolute; top: 4px; bottom: 4px; width: calc(20% - 2px); background: rgba(255,255,255,0.1); border-radius: var(--radius-pill); transition: transform var(--spring); z-index: 1; }
 
         .input-drawer { overflow: hidden; transition: all var(--spring); max-height: 0; opacity: 0; }
         .input-drawer.open { max-height: 100px; opacity: 1; margin-bottom: 24px; }
@@ -614,8 +614,9 @@
             <div class="tab-slider" id="tab-slider"></div>
             <div class="tab active" onclick="App.switchTab('all', 0)">All Tracks</div>
             <div class="tab" onclick="App.switchTab('favorites', 1)">Favorites</div>
-            <div class="tab" onclick="App.switchTab('playlists', 2)">Playlists</div>
-            <div class="tab" onclick="App.switchTab('offline', 3)">Offline</div>
+            <div class="tab" onclick="App.switchTab('offline', 2)">Offline</div>
+            <div class="tab" onclick="window.location.href='/premium.html'">Gnokz Music</div>
+            <div class="tab" onclick="App.switchTab('playlists', 4)">Playlists</div>
         </div>
 
         <div class="list-header">
@@ -986,7 +987,7 @@
                     if(playlist) tracks = this.localCache.filter(t => playlist.trackIds.includes(t.id)).map(t => ({...t, type: 'local'}));
                 } else {
                     document.getElementById('list-title').innerText = 'Offline Playlists';
-                    list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.switchTab('playlists', 2)"><i data-lucide="arrow-left" style="width:16px;"></i> Return to Core Tree</div>`);
+                    list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.switchTab('playlists', 4)"><i data-lucide="arrow-left" style="width:16px;"></i> Return to Core Tree</div>`);
                     const filteredPlaylists = DataManager.data.playlists.filter(p => p.type === 'local');
                     document.getElementById('list-count').innerText = `${filteredPlaylists.length} Playlists`;
                     if(filteredPlaylists.length === 0) {
@@ -1021,7 +1022,7 @@
                     if(playlist) tracks = DataManager.data.tracks.filter(t => playlist.trackIds.includes(t.id)).map(t => ({...t, type: 'yt'}));
                 } else {
                     document.getElementById('list-title').innerText = 'YouTube Playlists';
-                    list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.switchTab('playlists', 2)"><i data-lucide="arrow-left" style="width:16px;"></i> Return to Core Tree</div>`);
+                    list.insertAdjacentHTML('beforeend', `<div class="back-btn-container" onclick="App.switchTab('playlists', 4)"><i data-lucide="arrow-left" style="width:16px;"></i> Return to Core Tree</div>`);
                     const filteredPlaylists = DataManager.data.playlists.filter(p => p.type === 'yt');
                     document.getElementById('list-count').innerText = `${filteredPlaylists.length} Playlists`;
                     if(filteredPlaylists.length === 0) {
@@ -1350,9 +1351,9 @@
         routeContextPlaylistFromOverlay() {
             this.closeFullscreenPlayer();
             if(this.currentTrackType === 'local') {
-                this.switchTab('sub_playlist_local_root', 2);
+                this.switchTab('sub_playlist_local_root', 4);
             } else {
-                this.switchTab('sub_playlist_yt_root', 2);
+                this.switchTab('sub_playlist_yt_root', 4);
             }
         },
 
