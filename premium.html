@@ -242,12 +242,6 @@
             overflow: hidden; background: #0f0f12; box-shadow: 0 20px 50px rgba(0,0,0,0.6); margin-bottom: 28px;
         }
         .card-artwork-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .card-embedded-watermark {
-            position: absolute; bottom: 18px; right: 18px; background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(15px); border-radius: 20px; padding: 6px 14px;
-            display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-        }
 
         .card-track-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding: 0 4px; }
         .card-meta-left { min-width: 0; width: 100%; }
@@ -293,7 +287,6 @@
 <div class="container">
     <div class="header">
         <h2>Gnokz Exclusive</h2>
-        <!-- Header Luxury Go Back Button (Main Navigation) -->
         <button class="back-luxury-btn" onclick="window.location.href='index.html'">
             <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
             <span>Go Back</span>
@@ -351,10 +344,6 @@
 
         <div class="card-main-visual-box">
             <img class="card-artwork-img" id="card-hero-thumb" src="">
-            <div class="card-embedded-watermark">
-                <i data-lucide="youtube" style="width:14px; height:14px; color:#ff0000; fill:#ff0000;"></i>
-                <span>GNOKZ PRO</span>
-            </div>
         </div>
 
         <div class="card-track-meta">
@@ -442,8 +431,10 @@
                 if (data.error) throw new Error(data.error.message);
 
                 if (data.items && data.items.length > 0) {
+                    // Limit at filter para sa 20 exclusive tracks lamang
                     this.queue = data.items
                         .filter(item => item.snippet.title !== "Deleted video" && item.snippet.title !== "Private video")
+                        .slice(0, 20)
                         .map(item => ({
                             id: item.snippet.resourceId.videoId,
                             title: item.snippet.title,
